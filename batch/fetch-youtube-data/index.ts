@@ -50,7 +50,7 @@ const callYoutubeAPI = async (channelId: string, lastDatetime: dayjs.Dayjs, firs
 const upsertVideo = async (prisma: prismaTransacrion, data: Prisma.videoCreateManyInput) => {
   return prisma.video.upsert({
     where: {
-      video_identifier: {
+      id_video_id: {
         id: data.id,
         video_id: data.video_id
       }

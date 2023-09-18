@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,8 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// チャンネルテーブル
 model channel {
-  id Int @id
-  name String
+  id   String @id @db.VarChar(50)
+  name String @db.VarChar(255)
+}
+
+model video {
+  id           String   @db.VarChar(50)
+  video_id     String   @db.VarChar(50)
+  title        String   @db.VarChar(255)
+  published_at DateTime @db.Timestamptz(6)
+
+  @@unique([id, video_id])
+}
+
+model video_batch_event {
+  event_id       Int      @id @default(autoincrement())
+  channel_id     String   @db.VarChar(50)
+  first_datetime DateTime @db.Timestamptz(6)
+  last_datetime  DateTime @db.Timestamptz(6)
 }
