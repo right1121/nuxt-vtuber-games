@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import timezone from 'dayjs/plugin/timezone'
 import { ITXClientDenyList } from '@prisma/client/runtime/library'
+import 'dotenv/config'
 
 type prismaTransacrion = Omit<PrismaClient, ITXClientDenyList>
 
@@ -13,7 +14,7 @@ dayjs.tz.setDefault('Asia/Tokyo')
 
 const prisma = new PrismaClient()
 
-const API_KEY = ''
+const API_KEY = process.env.NUXT_GOOGLE_API_KEY
 
 const youtube = google.youtube({
   version: 'v3',

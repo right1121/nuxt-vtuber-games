@@ -13,6 +13,7 @@
     "@nuxt/devtools": "latest",
     "@types/node": "^18.17.3",
     "autoprefixer": "^10.4.14",
+    "dotenv": "^16.3.1",
     "googleapis": "^126.0.1",
     "nuxt": "^3.6.5",
     "postcss": "^8.4.27",
