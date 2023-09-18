@@ -6,7 +6,8 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "batch:fetch-video": "ts-node --esm --compilerOptions={\\\"module\\\":\\\"commonjs\\\",\\\"esModuleInterop\\\":true} ./batch/fetch-youtube-data/index.ts"
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
