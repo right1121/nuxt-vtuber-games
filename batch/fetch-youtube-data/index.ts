@@ -12,7 +12,9 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.tz.setDefault('Asia/Tokyo')
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error']
+})
 
 const API_KEY = process.env.NUXT_GOOGLE_API_KEY
 
@@ -45,29 +47,6 @@ const callYoutubeAPI = async (channelId: string, lastDatetime: dayjs.Dayjs, firs
   const nestItems = await callYoutubeAPI(channelId, lastDatetime, firstDatetime, nextPageToken, items)
 
   return [...preItems, ...nestItems]
-}
-
-const upsertVideo = async (prisma: prismaTransacrion, data: Prisma.videoCreateManyInput) => {
-  return prisma.video.upsert({
-    where: {
-      id_video_id: {
-        id: data.id,
-        video_id: data.video_id
-      }
-    },
-    create: {
-      id: data.id,
-      video_id: data.video_id,
-      title: data.title,
-    published_at: data.published_at,
-    },
-    update: {
-      title: data.title,
-      published_at: data.published_at
-    },
-  }).catch(cause => {
-    throw Error('動画情報の更新に失敗しました。', { cause })
-  })
 }
 
 const updateBatchEvent = async (tx: prismaTransacrion, channel_id: string) => {
@@ -158,9 +137,9 @@ const main = async () => {
         }
       })
   
-      for (const d of data) {
-        await upsertVideo(prisma, d)
-      }
+      await prisma.video.createMany({
+        data
+      })
     })
     .then(() => result.success())
     .catch(error => {
