@@ -62,7 +62,7 @@ const updateBatchEvent = async (tx: prismaTransacrion, channel_id: string, now: 
   })
   const firstDatetime = event ? dayjs(event.last_datetime).tz() : dayjs('2017-01-01T00:00:00Z').tz()
   const lastDatetime = (() => {
-    const _d = dayjs(firstDatetime).tz().add(1, 'year')
+    const _d = dayjs(firstDatetime).tz().add(6, 'month')
 
     const now = dayjs.tz()
     return now < _d ? now : _d
