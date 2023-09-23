@@ -23,6 +23,8 @@ const youtube = google.youtube({
   auth: API_KEY,
 });
 
+const program_id = 'get_channel_video_batch'
+
 const callYoutubeAPI = async (channelId: string, lastDatetime: dayjs.Dayjs, firstDatetime: dayjs.Dayjs, pageToken: string = '', preItems: youtube_v3.Schema$SearchResult[] = []): Promise<youtube_v3.Schema$SearchResult[]> => {
   const res = await youtube.search.list({
     part: ['snippet'],
@@ -49,8 +51,8 @@ const callYoutubeAPI = async (channelId: string, lastDatetime: dayjs.Dayjs, firs
   return [...preItems, ...nestItems]
 }
 
-const updateBatchEvent = async (tx: prismaTransacrion, channel_id: string) => {
-  const event = await tx.video_batch_event.findFirst({
+const updateBatchEvent = async (tx: prismaTransacrion, channel_id: string, now: dayjs.Dayjs) => {
+  const event = await tx.channel_video_batch_event.findFirst({
     where: {
       channel_id: channel_id,
     },
@@ -60,16 +62,21 @@ const updateBatchEvent = async (tx: prismaTransacrion, channel_id: string) => {
   })
   const firstDatetime = event ? dayjs(event.last_datetime).tz() : dayjs('2017-01-01T00:00:00Z').tz()
   const lastDatetime = (() => {
-    const _d = dayjs(firstDatetime).tz().add(1, 'year')
+    const _d = dayjs(firstDatetime).tz().add(6, 'month')
 
     const now = dayjs.tz()
     return now < _d ? now : _d
   })()
-  await tx.video_batch_event.create({
+  await tx.channel_video_batch_event.create({
     data: {
       channel_id: channel_id,
       first_datetime: firstDatetime.format(),
-      last_datetime: lastDatetime.format()
+      last_datetime: lastDatetime.format(),
+      created_at: now.format(),
+      created_user: program_id,
+      updated_at: now.format(),
+      updated_user: program_id,
+      program_id
     }
   })
 
@@ -116,13 +123,15 @@ const main = async () => {
   const channels = await prisma.channel.findMany()
   const result = new BatchResult()
 
+  const now = dayjs().tz()
+
   for (const channel of channels) {
-    console.info(`[${channel.id}]`, channel.name, 'start')
+    console.info(`[${channel.channel_id}]`, channel.name, 'start')
 
     await prisma.$transaction(async (prisma) => {
-      const res = await updateBatchEvent(prisma, channel.id).catch(cause => { throw Error('バッチイベントの更新エラー', { cause }) })
+      const res = await updateBatchEvent(prisma, channel.channel_id, now).catch(cause => { throw Error('バッチイベントの更新エラー', { cause }) })
   
-      const items = await callYoutubeAPI(channel.id, res.firstDatetime, res.lastDatetime)
+      const items = await callYoutubeAPI(channel.channel_id, res.firstDatetime, res.lastDatetime)
 
       console.info('%d件処理', items.length)
   
@@ -130,10 +139,15 @@ const main = async () => {
         const publishedAt = dayjs(item.snippet?.publishedAt).tz()
    
         return {
-          id: channel.id,
+          channel_id: channel.channel_id,
           video_id: item.id?.videoId as string,
           title: item.snippet?.title as string,
-          published_at: publishedAt.format()
+          published_at: publishedAt.format(),
+          created_at: now.format(),
+          created_user: program_id,
+          updated_at: now.format(),
+          updated_user: program_id,
+          program_id
         }
       })
   
