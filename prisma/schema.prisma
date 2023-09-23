@@ -8,22 +8,42 @@ datasource db {
 }
 
 model channel {
-  id   String @id @db.VarChar(50)
-  name String @db.VarChar(255)
+  channel_id                String                      @id @db.VarChar(100)
+  name                      String                      @db.VarChar(255)
+  created_at                DateTime                    @db.Timestamptz(6)
+  created_user              String                      @db.VarChar(255)
+  updated_at                DateTime                    @db.Timestamptz(6)
+  updated_user              String                      @db.VarChar(255)
+  program_id                String                      @db.VarChar(255)
+  channel_video_batch_event channel_video_batch_event[]
+  video                     video[]
 }
 
 model video {
-  id           String   @db.VarChar(50)
-  video_id     String   @db.VarChar(50)
+  video_id     String   @id @db.VarChar(50)
+  channel_id   String   @db.VarChar(50)
   title        String   @db.VarChar(255)
   published_at DateTime @db.Timestamptz(6)
-
-  @@unique([id, video_id])
+  created_at   DateTime @db.Timestamptz(6)
+  created_user String   @db.VarChar(255)
+  updated_at   DateTime @db.Timestamptz(6)
+  updated_user String   @db.VarChar(255)
+  program_id   String   @db.VarChar(255)
+  channel      channel  @relation(fields: [channel_id], references: [channel_id], onDelete: NoAction, onUpdate: NoAction, map: "video_channel_id_key")
 }
 
-model video_batch_event {
-  event_id       Int      @id @default(autoincrement())
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model channel_video_batch_event {
+  event_id       BigInt   @default(autoincrement())
   channel_id     String   @db.VarChar(50)
   first_datetime DateTime @db.Timestamptz(6)
   last_datetime  DateTime @db.Timestamptz(6)
+  created_at     DateTime @db.Timestamptz(6)
+  created_user   String   @db.VarChar(255)
+  updated_at     DateTime @db.Timestamptz(6)
+  updated_user   String   @db.VarChar(255)
+  program_id     String   @db.VarChar(255)
+  channel        channel  @relation(fields: [channel_id], references: [channel_id], onDelete: NoAction, onUpdate: NoAction, map: "channel_video_batch_event_channel_id_key")
+
+  @@id([event_id, channel_id])
 }
