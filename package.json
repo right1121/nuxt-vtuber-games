@@ -7,10 +7,12 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "typecheck": "nuxi typecheck",
     "batch:fetch-video": "ts-node --esm --compilerOptions={\\\"module\\\":\\\"commonjs\\\",\\\"esModuleInterop\\\":true} ./batch/fetch-youtube-data/index.ts",
     "lint": "eslint --cache-location ./node_modules/.cache/eslint/ .",
     "lint:fix": "eslint --fix --cache-location ./node_modules/.cache/eslint/ .",
     "prettier": "prettier --write --list-different .",
+    "prettier:check": "prettier --check .",
     "fix": "yarn lint:fix && yarn prettier"
   },
   "devDependencies": {
@@ -36,5 +38,9 @@
   "dependencies": {
     "@prisma/client": "^5.2.0",
     "dayjs": "^1.11.9"
+  },
+  "volta": {
+    "node": "18.18.0",
+    "yarn": "1.22.19"
   }
 }
