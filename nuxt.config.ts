@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  modules: ['@nuxtjs/eslint-module'],
   css: ['~/assets/css/main.css'],
   postcss: {
     plugins: {
@@ -7,5 +8,5 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  devtools: { enabled: true }
+  devtools: { enabled: true },
 })
